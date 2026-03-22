@@ -1,20 +1,5 @@
---Câu 1: Tạo danh sách người dùng cho hệ thống
---Chạy schema nhớ dùng một user khác có đủ quyền hạn
---Xóa danh sách người dùng để chạy lại nếu có
-alter session set container = XEPDB1;
-CREATE USER QLBENHVIEN IDENTIFIED BY 123;
-GRANT CREATE SESSION TO QLBENHVIEN;
-GRANT CREATE TABLE TO QLBENHVIEN;
-GRANT CREATE VIEW TO QLBENHVIEN;
-ALTER USER QLBENHVIEN QUOTA UNLIMITED ON USERS;
-GRANT CREATE USER TO QLBENHVIEN;
-GRANT EXECUTE ON DBMS_RLS TO QLBENHVIEN;
-GRANT CREATE PROCEDURE TO QLBENHVIEN;
-
---Đăng nhập vào để tạo schema
-connect QLBENHVIEN/123@localhost:1521/XEPDB1;
-
---Chạy khi đăng nhập vào user mới tạo ở trên
+-- Scripts tạo user cho bệnh nhân và nhân viên (được chạy bằng C#)
+-- QLBENHVIEN schema đã được tạo bởi DatabaseSeeder.cs
 --Danh sách bệnh nhân
 begin
     for r in (select MABN from BENHNHAN) loop
