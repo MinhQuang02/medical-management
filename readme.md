@@ -2,8 +2,8 @@
 
 ### Chạy dự án
 ```bash
-dotnet run --project AdminModule\AdminApp.csproj
+& "$HOME\AppData\Local\Microsoft\dotnet\dotnet" run --project AdminModule\AdminApp.csproj
 ```
 ```bash
-dotnet run --project MedicalModule\MedicalApp.csproj
+& "$HOME\AppData\Local\Microsoft\dotnet\dotnet" run --project MedicalModule\MedicalApp.csproj
 ```
