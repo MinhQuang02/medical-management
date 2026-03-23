@@ -20,3 +20,5 @@ E:\Node\medical-data-management\MedicalModule\obj\Debug\net8.0-windows\refint\Me
 E:\Node\medical-data-management\MedicalModule\obj\Debug\net8.0-windows\MedicalApp.pdb
 E:\Node\medical-data-management\MedicalModule\obj\Debug\net8.0-windows\MedicalApp.genruntimeconfig.cache
 E:\Node\medical-data-management\MedicalModule\obj\Debug\net8.0-windows\ref\MedicalApp.dll
+E:\Node\medical-data-management\MedicalModule\bin\Debug\net8.0-windows\System.Security.Cryptography.Pkcs.dll
+E:\Node\medical-data-management\MedicalModule\bin\Debug\net8.0-windows\runtimes\win\lib\net8.0\System.Security.Cryptography.Pkcs.dll
