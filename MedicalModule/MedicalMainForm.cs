@@ -7,6 +7,7 @@ public partial class MedicalMainForm : Form
     private readonly DatabaseService _dbService;
     private readonly string _username;
     private List<string> _roles = new();
+    private bool isCoord, isDoc, isTech, isPatient, isAdmin;
 
     public MedicalMainForm(DatabaseService dbService, string username)
     {
@@ -31,9 +32,42 @@ public partial class MedicalMainForm : Form
         // Navigation clicks
         btnNavProfile.Click += (s, e) => { SwitchTab(tabProfile, btnNavProfile); LoadPatientProfile(); };
         btnNavTechServices.Click += (s, e) => { SwitchTab(tabTechServices, btnNavTechServices); LoadTechServices(); };
-        btnNavCoordPatients.Click += (s, e) => { SwitchTab(tabCoordPatients, btnNavCoordPatients); LoadCoordPatients(); };
-        btnNavCoordRecords.Click += (s, e) => { SwitchTab(tabCoordRecords, btnNavCoordRecords); LoadCoordRecords(); };
-        btnNavDocRecords.Click += (s, e) => { SwitchTab(tabDocRecords, btnNavDocRecords); LoadDocRecords(); };
+        btnNavCoordPatients.Click += (s, e) => { 
+            if (isCoord && !isAdmin)
+            {
+                OpenChildForm(new CoordinatorForm(_dbService, _username));
+            }
+            
+            else
+            {
+                SwitchTab(tabCoordPatients, btnNavCoordPatients);
+                LoadCoordPatients();
+            )
+        };
+        btnNavCoordRecords.Click += (s, e) => {
+            if (isCoord && !isAdmin)
+            {
+                OpenChildForm(new CoordinatorForm(_dbService, _username));
+            }
+            
+            else
+            {
+                SwitchTab(tabCoordRecords, btnNavCoordRecords);
+                LoadCoordRecords();
+            }
+        };
+        btnNavDocRecords.Click += (s, e) => { 
+            if (isDoc && !isAdmin)
+            {
+                OpenChildForm(new DoctorForm(_dbService, _username));
+            }
+            
+            else
+            {
+                SwitchTab(tabDocRecords, btnNavDocRecords);
+                LoadDocRecords();
+            }
+        };
         btnNavNotifications.Click += (s, e) => { SwitchTab(tabNotifications, btnNavNotifications); LoadNotifications(); };
 
         // Attach CRUD events for each role
@@ -51,15 +85,15 @@ public partial class MedicalMainForm : Form
             // If checking roles fails, we use username heuristic
         }
 
-        bool isPatient = _roles.Any(r => r.Contains("PATIENT") || r.Contains("BENHNHAN")) || _username.StartsWith("BN");
-        bool isTech = _roles.Any(r => r.Contains("TECHNICIAN") || r.Contains("KTV")) || _username.StartsWith("KTV");
-        bool isCoord = _roles.Any(r => r.Contains("COORDINATOR") || r.Contains("DIEUPHOI")) || _username.StartsWith("DP");
-        bool isDoc = _roles.Any(r => r.Contains("DOCTOR") || r.Contains("BACSI")) || _username.StartsWith("BS");
+        isPatient = _roles.Any(r => r.Contains("PATIENT") || r.Contains("BENHNHAN")) || _username.StartsWith("BN");
+        isTech = _roles.Any(r => r.Contains("TECHNICIAN") || r.Contains("KTV")) || _username.StartsWith("KTV");
+        isCoord = _roles.Any(r => r.Contains("COORDINATOR") || r.Contains("DIEUPHOI")) || _username.StartsWith("DP");
+        isDoc = _roles.Any(r => r.Contains("DOCTOR") || r.Contains("BACSI")) || _username.StartsWith("BS");
 
         if (!isPatient && !isTech && !isCoord && !isDoc)
         {
-            // DEBUG MODE: Nếu tên đăng nhập không nhận diện được (ví dụ gõ bừa), hiện tất cả để xem UI
-            isPatient = true; isTech = true; isCoord = true; isDoc = true;
+            // DEBUG MODE: Nếu tên đăng nhập bằng tài khoản chứa database, hiện tất cả để xem UI
+            isAdmin = true;
         }
 
         btnNavProfile.Visible = isPatient;
@@ -69,13 +103,26 @@ public partial class MedicalMainForm : Form
         btnNavDocRecords.Visible = isDoc; // Contains all doctor functionalities
         btnNavNotifications.Visible = true; // All users
 
+        if (isAdmin)
+        {
+            btnNavProfile.Visible = true;
+            btnNavTechServices.Visible = true;
+            btnNavCoordPatients.Visible = true;
+            btnNavCoordRecords.Visible = true;
+            btnNavDocRecords.Visible = true;
+        }
+        
         LayoutSidebar();
 
         // Show the first available tab
-        if (isPatient) { SwitchTab(tabProfile, btnNavProfile); LoadPatientProfile(); }
+        if (isPatient || isAdmin) { SwitchTab(tabProfile, btnNavProfile); LoadPatientProfile(); }
         else if (isTech) { SwitchTab(tabTechServices, btnNavTechServices); LoadTechServices(); }
-        else if (isCoord) { SwitchTab(tabCoordPatients, btnNavCoordPatients); LoadCoordPatients(); }
-        else if (isDoc) { SwitchTab(tabDocRecords, btnNavDocRecords); LoadDocRecords(); }
+        else if (isCoord && !isAdmin) { 
+            OpenChildForm(new CoordinatorForm(_dbService, _username));
+        }
+        else if (isDoc) {
+            OpenChildForm(new DoctorForm(_dbService, _username));
+        }
         else { SwitchTab(tabNotifications, btnNavNotifications);  LoadNotifications(); }
     }
 
@@ -118,6 +165,21 @@ public partial class MedicalMainForm : Form
             if (c is Button b) b.BackColor = Color.Transparent;
         }
         activeBtn.BackColor = Color.FromArgb(45, 55, 75);
+    }
+
+    //Ham de mo them form moi theo role
+    private void OpenChildForm(Form child)
+    {
+        panelSidebar.Visible = false;
+        tabControlMain.Visible = false;
+
+        child.TopLevel = false;
+        child.FormBorderStyle = FormBorderStyle.None;
+        child.Dock = DockStyle.Fill;
+
+        this.Controls.Add(child);
+        child.BringToFront();
+        child.Show();
     }
 
     private void ShowError(string msg) => MessageBox.Show(msg, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
