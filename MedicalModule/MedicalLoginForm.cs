@@ -35,7 +35,7 @@ public partial class MedicalLoginForm : Form
             {
                 MessageBox.Show(
                     "Kết nối thất bại!\n\nKiểm tra lại:\n" +
-                    "  • Tên tài khoản (BS001 / DP001 / KTV001 / BN00001)\n" +
+                    "  • Tên tài khoản (BS001 / DP001 / KTV001 / BN00001 / U1-U8)\n" +
                     "  • Mật khẩu (mặc định: 123)\n" +
                     "  • Oracle xepdb1 đang chạy",
                     "Lỗi kết nối", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -44,17 +44,26 @@ public partial class MedicalLoginForm : Form
 
             btnLogin.Text = "Đang xác thực quyền...";
 
-            // ── Step 2: Fetch Oracle roles on background thread ───────────
-            List<string> roles = await Task.Run(() => db.GetCurrentUserRoles());
-
-            // ── Step 3: Route to correct form (runs on UI thread) ─────────
+            // ── Step 2: Determine which form to show ─────────────────────
             Form targetForm;
 
-            if      (roles.Contains("DIEUPHOIVIEN")) targetForm = new CoordinatorForm(db, username);
-            else if (roles.Contains("BACSI"))         targetForm = new DoctorForm(db, username);
-            else if (roles.Contains("KYTHUATVIEN"))   targetForm = new TechnicianForm(db, username);
-            else if (roles.Contains("BENHNHAN"))      targetForm = new PatientForm(db, username);
-            else                                       targetForm = new EmployeeForm(db, username);
+            // Check if this is an OLS notification user (U1 through U8)
+            if (IsOlsUser(username))
+            {
+                // Route directly to NotificationForm for OLS demo
+                targetForm = new NotificationForm(db, username);
+            }
+            else
+            {
+                // Fetch Oracle roles for medical module routing
+                List<string> roles = await Task.Run(() => db.GetCurrentUserRoles());
+
+                if      (roles.Contains("DIEUPHOIVIEN")) targetForm = new CoordinatorForm(db, username);
+                else if (roles.Contains("BACSI"))         targetForm = new DoctorForm(db, username);
+                else if (roles.Contains("KYTHUATVIEN"))   targetForm = new TechnicianForm(db, username);
+                else if (roles.Contains("BENHNHAN"))      targetForm = new PatientForm(db, username);
+                else                                       targetForm = new EmployeeForm(db, username);
+            }
 
             this.Hide();
             targetForm.FormClosed += (s, args) => this.Close();
@@ -72,5 +81,22 @@ public partial class MedicalLoginForm : Form
             btnLogin.Enabled = true;
             btnLogin.Text    = "Đăng nhập";
         }
+    }
+
+    /// <summary>
+    /// Check if the username is one of the OLS demo users (U1 through U8).
+    /// These users are created by ols_thongbao.sql for Requirement 2.
+    /// </summary>
+    private static bool IsOlsUser(string username)
+    {
+        if (string.IsNullOrEmpty(username) || username.Length < 2) return false;
+        
+        char first = char.ToUpper(username[0]);
+        char second = username[1];
+        
+        return first == 'U'
+            && second >= '1'
+            && second <= '8'
+            && username.Length == 2;
     }
 }
