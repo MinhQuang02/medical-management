@@ -1,3 +1,6 @@
+-- ================================================================
+-- Phần 1: Kích hoạt tính năng kiểm toán và thiết lập các tùy chọn cơ bản
+-- ================================================================
 ALTER SESSION SET CONTAINER = XEPDB1;
 
 SHOW PARAMETER AUDIT_TRAIL;
@@ -39,6 +42,9 @@ FROM DUAL;
 
 COMMIT;
 /
+-- ================================================================
+-- Phần 2: Thiết lập các chính sách kiểm toán chi tiết (standard audit)
+-- ================================================================
 -- ============================================================
 -- 0. CONNECT AS DBA / QLBENHVIEN
 -- ============================================================
@@ -144,30 +150,6 @@ CONN KTV001/123@localhost:1521/XEPDB1
 DELETE FROM QLBENHVIEN.DONTHUOC;
 
 -- ============================================================
--- 9. VIEW AUDIT LOG
--- ============================================================
-CONN QLBENHVIEN/123@localhost:1521/XEPDB1
-
-COLUMN USERNAME FORMAT A15
-COLUMN ACTION_NAME FORMAT A20
-COLUMN OBJ_NAME FORMAT A25
-
-SELECT 
-    USERNAME,
-    ACTION_NAME,
-    OBJ_NAME,
-    RETURNCODE,
-    TO_CHAR(TIMESTAMP, 'DD-MM-YYYY HH24:MI:SS') AS TIME
-FROM DBA_AUDIT_TRAIL
-WHERE OBJ_NAME IN (
-    'HSBA',
-    'HSBA_DV',
-    'KTV_XEMHSBA_DV',
-    'DONTHUOC'
-)
-ORDER BY TIMESTAMP DESC;
-
--- ============================================================
 -- 10. INTERPRETATION NOTE
 -- ============================================================
 -- RETURNCODE = 0  → SUCCESS
@@ -176,7 +158,7 @@ ORDER BY TIMESTAMP DESC;
 COMMIT;   
 
 -- ================================================================
--- YÊU CẦU 3
+-- Phần 3: Thiết lập các chính sách kiểm toán chi tiết (fine-grained audit)
 -- ================================================================
 -- Kết nối vào PDB (Pluggable Database) với quyền DBA
 ALTER SESSION SET CONTAINER = XEPDB1;
@@ -272,12 +254,38 @@ VALUES ('HS001', 'X-Quang', SYSDATE, 'KTV001', 'Binh Thuong');
 
 DELETE FROM QLBENHVIEN.HSBA_DV WHERE MAHSBA = 'HS001';
 
+-- ============================================================
+-- Phần 4: Đọc xuất dữ liệu nhật ký kiểm toán
+-- ============================================================
+-- Nhật ký kiểm toán tiêu chuẩn (Standard Audit Trail)
+CONN QLBENHVIEN/123@localhost:1521/XEPDB1
+
+COLUMN USERNAME FORMAT A15
+COLUMN ACTION_NAME FORMAT A20
+COLUMN OBJ_NAME FORMAT A25
+
 SELECT 
-    DB_USER, 
-    OBJECT_NAME, 
-    POLICY_NAME, 
-    SQL_TEXT, -- Cột này sẽ hiển thị rõ câu lệnh UPDATE của Bác sĩ
+    USERNAME,
+    ACTION_NAME,
+    OBJ_NAME,
+    RETURNCODE,
     TO_CHAR(TIMESTAMP, 'DD-MM-YYYY HH24:MI:SS') AS TIME
+FROM DBA_AUDIT_TRAIL
+WHERE OBJ_NAME IN (
+    'HSBA',
+    'HSBA_DV',
+    'KTV_XEMHSBA_DV',
+    'DONTHUOC'
+)
+ORDER BY TIMESTAMP DESC;
+-------------------------------------------------------------
+-- Nhật ký kiểm toán chi tiết (Fine-grained Audit Trail)
+SELECT 
+    DB_USER AS "NGUOI_DUNG", 
+    OBJECT_NAME AS "BANG", 
+    POLICY_NAME AS "TEN_CHINH_SACH", 
+    SQL_TEXT AS "CAU_LENH_DA_CHAY", 
+    TO_CHAR(TIMESTAMP, 'DD-MM-YYYY HH24:MI:SS') AS "THOI_GIAN"
 FROM DBA_FGA_AUDIT_TRAIL
 ORDER BY TIMESTAMP DESC;
 -- Kết nối lại bằng tài khoản Quản trị
@@ -285,12 +293,12 @@ CONN QLBENHVIEN/123@localhost:1521/XEPDB1;
 EXEC DBMS_AUDIT_MGMT.FLUSH_UNIFIED_AUDIT_TRAIL;
 
 SELECT 
-    DBUSERNAME, 
-    OBJECT_NAME, 
-    ACTION_NAME, 
-    UNIFIED_AUDIT_POLICIES, 
-    RETURN_CODE, -- Cột này sẽ hiện mã lỗi ORA-01031
-    TO_CHAR(EVENT_TIMESTAMP, 'DD-MM-YYYY HH24:MI:SS') AS TIME
+    DBUSERNAME AS "KE_XAM_PHAM", 
+    OBJECT_NAME AS "MUC_TIEU", 
+    ACTION_NAME AS "HANH_DONG", 
+    UNIFIED_AUDIT_POLICIES AS "CAMERA_BAT_LOI", 
+    RETURN_CODE AS "MA_LOI", 
+    TO_CHAR(EVENT_TIMESTAMP, 'DD-MM-YYYY HH24:MI:SS') AS "THOI_GIAN"
 FROM UNIFIED_AUDIT_TRAIL
 WHERE UNIFIED_AUDIT_POLICIES IN ('POL_HSBA_UPDATE_FAIL', 'POL_HSBADV_DML_FAIL')
 ORDER BY EVENT_TIMESTAMP DESC;
