@@ -40,15 +40,16 @@ partial class MedicalLoginForm
         this.panelLogin.Size = new Size(400, 300);
 
         this.lblTitle.Text = "HỆ THỐNG Y TẾ";
-        this.lblTitle.Font = new Font("Segoe UI Bold", 16);
+        this.lblTitle.Font = new Font("Segoe UI Bold", 16, FontStyle.Bold);
         this.lblTitle.ForeColor = Color.FromArgb(0, 120, 215);
         this.lblTitle.Location = new Point(0, 30);
-        this.lblTitle.Size = new Size(400, 30);
+        this.lblTitle.Size = new Size(400, 40);
         this.lblTitle.TextAlign = ContentAlignment.MiddleCenter;
 
         this.lblUser.Text = "Username:";
         this.lblUser.Location = new Point(50, 90);
         this.lblUser.Font = new Font("Segoe UI Semibold", 10);
+        this.lblUser.Size = new Size(120, 25);
 
         this.txtUsername.Location = new Point(50, 115);
         this.txtUsername.Size = new Size(300, 25);
@@ -57,6 +58,7 @@ partial class MedicalLoginForm
         this.lblPass.Text = "Password:";
         this.lblPass.Location = new Point(50, 155);
         this.lblPass.Font = new Font("Segoe UI Semibold", 10);
+        this.lblPass.Size = new Size(120, 25);
 
         this.txtPassword.Location = new Point(50, 180);
         this.txtPassword.Size = new Size(300, 25);
