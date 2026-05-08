@@ -2,8 +2,7 @@
 
 ### Chạy dự án
 ```bash
-& "$HOME\AppData\Local\Microsoft\dotnet\dotnet" run --project AdminModule\AdminApp.csproj
-```
-```bash
 & "$HOME\AppData\Local\Microsoft\dotnet\dotnet" run --project MedicalModule\MedicalApp.csproj
 ```
+
+Admin login is now integrated into the `MedicalModule` login screen.
