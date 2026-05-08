@@ -16,6 +16,7 @@ public class PatientForm : Form
     private TextBox txtMa = null!, txtTen = null!, txtPhai = null!, txtNgaySinh = null!, txtCCCD = null!;
     // Editable Fields
     private TextBox txtSoNha = null!, txtDuong = null!, txtQuan = null!, txtTinh = null!;
+    private TextBox txtTienSuBenh = null!, txtTienSuBenhGD = null!, txtDiUngThuoc = null!;
     private Button btnSave = null!;
 
     public PatientForm(DatabaseService db, string username)
@@ -53,8 +54,11 @@ public class PatientForm : Form
         txtDuong = AddRow("Tên Đường:", txtX, ref y, false);
         txtQuan = AddRow("Quận Huyện:", txtX, ref y, false);
         txtTinh = AddRow("Tỉnh/TP:", txtX, ref y, false);
+        txtTienSuBenh = AddRow("Tiền sử bệnh:", txtX, ref y, false);
+        txtTienSuBenhGD = AddRow("Tiền sử bệnh GĐ:", txtX, ref y, false);
+        txtDiUngThuoc = AddRow("Dị ứng thuốc:", txtX, ref y, false);
 
-        btnSave = new Button() { Text = "Lưu Thông Tin", Location = new Point(txtX, y + 10), Size = new Size(120, 30) };
+        btnSave = new Button() { Text = "Lưu Thông Tin", Location = new Point(txtX, y + 10), Size = new Size(160, 35) };
         btnSave.Click += BtnSave_Click;
         this.Controls.Add(btnSave);
     }
@@ -93,6 +97,9 @@ public class PatientForm : Form
                 txtDuong.Text = r["TENDUONG"].ToString();
                 txtQuan.Text = r["QUANHUYEN"].ToString();
                 txtTinh.Text = r["TINHTP"].ToString();
+                txtTienSuBenh.Text = r["TIENSUBENH"].ToString();
+                txtTienSuBenhGD.Text = r["TIENSUBENHGD"].ToString();
+                txtDiUngThuoc.Text = r["DIUNGTHUOC"].ToString();
             }
             else
             {
@@ -110,13 +117,16 @@ public class PatientForm : Form
         try
         {
             _db.ExecuteNonQuery(
-                $"UPDATE {Schema}.BN_XEMTHONGTIN_BN SET SONHA = :sn, TENDUONG = :td, QUANHUYEN = :qh, TINHTP = :tp",
+                $"UPDATE {Schema}.BN_XEMTHONGTIN_BN SET SONHA = :sn, TENDUONG = :td, QUANHUYEN = :qh, TINHTP = :tp, TIENSUBENH = :tsb, TIENSUBENHGD = :tsbgd, DIUNGTHUOC = :dut",
                 new OracleParameter[]
                 {
                     new OracleParameter("sn", txtSoNha.Text),
                     new OracleParameter("td", txtDuong.Text),
                     new OracleParameter("qh", txtQuan.Text),
-                    new OracleParameter("tp", txtTinh.Text)
+                    new OracleParameter("tp", txtTinh.Text),
+                    new OracleParameter("tsb", txtTienSuBenh.Text),
+                    new OracleParameter("tsbgd", txtTienSuBenhGD.Text),
+                    new OracleParameter("dut", txtDiUngThuoc.Text)
                 });
             MessageBox.Show("Cập nhật thành công!");
             LoadData(); // reload to confirm
