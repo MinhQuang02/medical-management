@@ -97,7 +97,7 @@ public partial class DoctorForm : Form
 
         try
         {
-            int result = await Task.Run(() =>
+            await Task.Run(() =>
                 _db.ExecuteNonQuery(
                     $@"UPDATE {Schema}.NHANVIEN
                        SET QUEQUAN = :qq,
@@ -112,20 +112,13 @@ public partial class DoctorForm : Form
                 )
             );
 
-            if (result > 0)
-            {
-                await SafeLoadAsync(
-                    () => _db.ExecuteQuery($"SELECT * FROM {Schema}.NHANVIEN"),
-                    dgvNhanVien,
-                    "Nhân Viên"
-                );
+            await SafeLoadAsync(
+                () => _db.ExecuteQuery($"SELECT * FROM {Schema}.NHANVIEN"),
+                dgvNhanVien,
+                "Nhân Viên"
+            );
 
-                MessageBox.Show("Cập nhật thông tin thành công!");
-            }
-            else
-            {
-                MessageBox.Show("Không có dữ liệu được cập nhật.");
-            }
+            MessageBox.Show("Cập nhật thông tin thành công!");
         }
         catch (Exception ex)
         {
@@ -141,7 +134,7 @@ public partial class DoctorForm : Form
 
         try
         {
-            int result = await Task.Run(() =>
+            await Task.Run(() =>
                 _db.ExecuteNonQuery(
                     $@"UPDATE {Schema}.HSBA
                        SET CHANDOAN = :cd,
@@ -158,20 +151,13 @@ public partial class DoctorForm : Form
                 )
             );
 
-            if (result > 0)
-            {
-                await SafeLoadAsync(
-                    () => _db.ExecuteQuery($"SELECT * FROM {Schema}.HSBA"),
-                    dgvHSBA,
-                    "HSBA"
-                );
+            await SafeLoadAsync(
+                () => _db.ExecuteQuery($"SELECT * FROM {Schema}.HSBA"),
+                dgvHSBA,
+                "HSBA"
+            );
 
-                MessageBox.Show("Cập nhật HSBA thành công!");
-            }
-            else
-            {
-                MessageBox.Show("Không cập nhật được HSBA.");
-            }
+            MessageBox.Show("Cập nhật HSBA thành công!");
         }
         catch (Exception ex)
         {
@@ -187,7 +173,7 @@ public partial class DoctorForm : Form
 
         try
         {
-            int result = await Task.Run(() =>
+            await Task.Run(() =>
                 _db.ExecuteNonQuery(
                     $@"UPDATE {Schema}.BENHNHAN
                        SET TIENSUBENH = :ts,
@@ -204,20 +190,13 @@ public partial class DoctorForm : Form
                 )
             );
 
-            if (result > 0)
-            {
-                await SafeLoadAsync(
-                    () => _db.ExecuteQuery($"SELECT * FROM {Schema}.BENHNHAN"),
-                    dgvBenhNhan,
-                    "Bệnh Nhân"
-                );
+            await SafeLoadAsync(
+                () => _db.ExecuteQuery($"SELECT * FROM {Schema}.BENHNHAN"),
+                dgvBenhNhan,
+                "Bệnh Nhân"
+            );
 
-                MessageBox.Show("Cập nhật bệnh nhân thành công!");
-            }
-            else
-            {
-                MessageBox.Show("Không cập nhật được.");
-            }
+            MessageBox.Show("Cập nhật bệnh nhân thành công!");
         }
         catch (Exception ex)
         {
@@ -231,7 +210,7 @@ public partial class DoctorForm : Form
 
         try
         {
-            int result = await Task.Run(() =>
+            await Task.Run(() =>
                 _db.ExecuteNonQuery(
                     $@"INSERT INTO {Schema}.DONTHUOC
                        (MAHSBA, NGAYDT, TENTHUOC, LIEUDUNG)
@@ -245,16 +224,13 @@ public partial class DoctorForm : Form
                 )
             );
 
-            if (result > 0)
-            {
-                await SafeLoadAsync(
-                    () => _db.ExecuteQuery($"SELECT * FROM {Schema}.DONTHUOC"),
-                    dgvDonThuoc,
-                    "Đơn Thuốc"
-                );
+            await SafeLoadAsync(
+                () => _db.ExecuteQuery($"SELECT * FROM {Schema}.DONTHUOC"),
+                dgvDonThuoc,
+                "Đơn Thuốc"
+            );
 
-                MessageBox.Show("Thêm đơn thuốc thành công!");
-            }
+            MessageBox.Show("Thêm đơn thuốc thành công!");
         }
         catch (Exception ex)
         {
@@ -270,7 +246,7 @@ public partial class DoctorForm : Form
 
         try
         {
-            int result = await Task.Run(() =>
+            await Task.Run(() =>
                 _db.ExecuteNonQuery(
                     $@"UPDATE {Schema}.DONTHUOC
                        SET LIEUDUNG = :lieu
@@ -290,20 +266,13 @@ public partial class DoctorForm : Form
                 )
             );
 
-            if (result > 0)
-            {
-                await SafeLoadAsync(
-                    () => _db.ExecuteQuery($"SELECT * FROM {Schema}.DONTHUOC"),
-                    dgvDonThuoc,
-                    "Đơn Thuốc"
-                );
+            await SafeLoadAsync(
+                () => _db.ExecuteQuery($"SELECT * FROM {Schema}.DONTHUOC"),
+                dgvDonThuoc,
+                "Đơn Thuốc"
+            );
 
-                MessageBox.Show("Cập nhật đơn thuốc thành công!");
-            }
-            else
-            {
-                MessageBox.Show("Không cập nhật được đơn thuốc.");
-            }
+            MessageBox.Show("Cập nhật đơn thuốc thành công!");
         }
         catch (Exception ex)
         {
@@ -330,7 +299,7 @@ public partial class DoctorForm : Form
 
         try
         {
-            int result = await Task.Run(() =>
+            await Task.Run(() =>
                 _db.ExecuteNonQuery(
                     $@"DELETE FROM {Schema}.DONTHUOC
                        WHERE MAHSBA = :ma
@@ -348,16 +317,13 @@ public partial class DoctorForm : Form
                 )
             );
 
-            if (result > 0)
-            {
-                await SafeLoadAsync(
-                    () => _db.ExecuteQuery($"SELECT * FROM {Schema}.DONTHUOC"),
-                    dgvDonThuoc,
-                    "Đơn Thuốc"
-                );
+            await SafeLoadAsync(
+                () => _db.ExecuteQuery($"SELECT * FROM {Schema}.DONTHUOC"),
+                dgvDonThuoc,
+                "Đơn Thuốc"
+            );
 
-                MessageBox.Show("Xóa đơn thuốc thành công!");
-            }
+            MessageBox.Show("Xóa đơn thuốc thành công!");
         }
         catch (Exception ex)
         {
@@ -383,7 +349,7 @@ public partial class DoctorForm : Form
 
         try
         {
-            int result = await Task.Run(() =>
+            await Task.Run(() =>
                 _db.ExecuteNonQuery(
                     $@"INSERT INTO {Schema}.HSBA_DV
                        (MAHSBA, LOAIDV, NGAYDV, MAKTV, KETQUA)
@@ -396,10 +362,7 @@ public partial class DoctorForm : Form
                 )
             );
 
-            if (result > 0)
-            {
-                MessageBox.Show("Thêm dịch vụ thành công!");
-            }
+            MessageBox.Show("Thêm dịch vụ thành công!");
         }
         catch (Exception ex)
         {
@@ -415,7 +378,7 @@ public partial class DoctorForm : Form
 
         try
         {
-            int result = await Task.Run(() =>
+            await Task.Run(() =>
                 _db.ExecuteNonQuery(
                     $@"DELETE FROM {Schema}.HSBA_DV
                        WHERE MAHSBA = :ma
@@ -433,10 +396,7 @@ public partial class DoctorForm : Form
                 )
             );
 
-            if (result > 0)
-            {
-                MessageBox.Show("Xóa dịch vụ thành công!");
-            }
+            MessageBox.Show("Xóa dịch vụ thành công!");
         }
         catch (Exception ex)
         {
