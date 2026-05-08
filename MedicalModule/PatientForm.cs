@@ -33,7 +33,7 @@ public class PatientForm : Form
     {
         int y = 20;
         int txtX = 150;
-        
+
         Label lblCore = new Label() { Text = "Thông tin cơ bản (Không thể sửa)", Location = new Point(20, y), AutoSize = true, Font = new Font("Arial", 10, FontStyle.Bold) };
         this.Controls.Add(lblCore);
         y += 30;
@@ -83,12 +83,12 @@ public class PatientForm : Form
                 txtMa.Text = r["MABN"].ToString();
                 txtTen.Text = r["TENBN"].ToString();
                 txtPhai.Text = r["PHAI"].ToString();
-                
+
                 if (r["NGAYSINH"] != DBNull.Value)
                     txtNgaySinh.Text = Convert.ToDateTime(r["NGAYSINH"]).ToString("dd/MM/yyyy");
-                
+
                 txtCCCD.Text = r["CCCD"].ToString();
-                
+
                 txtSoNha.Text = r["SONHA"].ToString();
                 txtDuong.Text = r["TENDUONG"].ToString();
                 txtQuan.Text = r["QUANHUYEN"].ToString();
