@@ -249,7 +249,7 @@ public class TechnicianForm : Form
         try
         {
             _db.ExecuteNonQuery(
-                $@"UPDATE {Schema}.NHANVIEN
+                $@"UPDATE {Schema}.KTV_XEMTTCANHAN
                    SET QUEQUAN = :qq,
                        SODT = :sdt
                    WHERE MANV = :manv",
