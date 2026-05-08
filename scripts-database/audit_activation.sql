@@ -148,26 +148,22 @@ WHERE ROWNUM = 1;
 -- FAILURE (Technician)
 CONN KTV001/123@localhost:1521/XEPDB1
 DELETE FROM QLBENHVIEN.DONTHUOC;
-
+COMMIT; 
 -- ============================================================
 -- 10. INTERPRETATION NOTE
 -- ============================================================
 -- RETURNCODE = 0  → SUCCESS
 -- RETURNCODE ≠ 0 → FAILURE
 
-COMMIT;   
-
 -- ================================================================
 -- Phần 3: Thiết lập các chính sách kiểm toán chi tiết (fine-grained audit)
 -- ================================================================
--- Kết nối vào PDB (Pluggable Database) với quyền DBA
-ALTER SESSION SET CONTAINER = XEPDB1;
 
 -- ============================================================
 -- PHẦN A: TẠO CÁC CHÍNH SÁCH KIỂM TOÁN (POLICIES)
 -- ============================================================
-
--- Xóa các policy cũ nếu có (để tránh lỗi khi chạy lại script)
+CONN QLBENHVIEN/123@localhost:1521/XEPDB1;
+-- Xóa các policy cũ nếu có 
 BEGIN
   DBMS_FGA.DROP_POLICY(object_schema => 'QLBENHVIEN', object_name => 'DONTHUOC', policy_name => 'FGA_AUDIT_DONTHUOC_COLS');
   DBMS_FGA.DROP_POLICY(object_schema => 'QLBENHVIEN', object_name => 'HSBA', policy_name => 'FGA_AUDIT_HSBA_COLS');
@@ -207,8 +203,27 @@ END;
 /
 
 -- ------------------------------------------------------------
--- Tình huống 3c: Hành vi cập nhật bất hợp pháp trên CHANDOAN, DIEUTRI, KETLUAN
+-- Tình huống 3d: Hành vi cập nhật bất hợp pháp trên CHANDOAN, DIEUTRI, KETLUAN
 -- ------------------------------------------------------------
+-- Dọn dẹp Unified Audit Policies cũ 
+-- ============================================================
+BEGIN
+   -- Xóa POL_HSBA_UPDATE_FAIL
+   BEGIN
+      EXECUTE IMMEDIATE 'NOAUDIT POLICY POL_HSBA_UPDATE_FAIL';
+      EXECUTE IMMEDIATE 'DROP AUDIT POLICY POL_HSBA_UPDATE_FAIL';
+   EXCEPTION WHEN OTHERS THEN NULL;
+   END;
+
+   -- Xóa POL_HSBADV_DML_FAIL
+   BEGIN
+      EXECUTE IMMEDIATE 'NOAUDIT POLICY POL_HSBADV_DML_FAIL';
+      EXECUTE IMMEDIATE 'DROP AUDIT POLICY POL_HSBADV_DML_FAIL';
+   EXCEPTION WHEN OTHERS THEN NULL;
+   END;
+END;
+/
+----------------------------------------------------------------------
 CREATE  AUDIT POLICY POL_HSBA_UPDATE_FAIL 
 ACTIONS UPDATE ON QLBENHVIEN.HSBA;
 
@@ -228,31 +243,31 @@ AUDIT POLICY POL_HSBADV_DML_FAIL WHENEVER NOT SUCCESSFUL;
 -- ============================================================
 
 -- [TEST 3a]: Bác sĩ cập nhật thông tin liều dùng trong ĐƠN THUỐC (Hợp lệ)
-CONNECT BS002/123@localhost:1521/XEPDB1
+CONN BS001/123@localhost:1521/XEPDB1
 UPDATE QLBENHVIEN.DONTHUOC 
 SET LIEUDUNG = 'Sang 1 vien, Toi 1 vien' 
-WHERE MAHSBA = 'HS001' AND TENTHUOC = 'PARACETAMOL';
+WHERE MAHSBA = 'HSBA001' AND TENTHUOC = 'Paracetamol';
 COMMIT;
 
 -- [TEST 3b]: Bác sĩ cập nhật thành công CĐ, ĐT, KL trên HSBA (Hợp lệ)
-CONN BS002/123@localhost:1521/XEPDB1
+CONN BS001/123@localhost:1521/XEPDB1
 UPDATE QLBENHVIEN.HSBA 
 SET CHANDOAN = 'Viem hong hat', DIEUTRI = 'Uong thuoc', KETLUAN = 'Theo doi them' 
-WHERE MAHSBA = 'HS001';
+WHERE MAHSBA = 'HSBA001';
 COMMIT;
 
 -- [TEST 3c]: Bệnh nhân cố tình cập nhật CHANDOAN trên HSBA (Bất hợp pháp - Lỗi thiếu quyền)
 CONN BN00001/123@localhost:1521/XEPDB1
 UPDATE QLBENHVIEN.HSBA 
 SET CHANDOAN = 'Khong co benh' 
-WHERE MAHSBA = 'HS001';
+WHERE MAHSBA = 'HSBA001';
 
 -- [TEST 3d]: Bệnh nhân cố tình INSERT/DELETE vào HSBA_DV (Bất hợp pháp)
 CONN BN00001/123@localhost:1521/XEPDB1
 INSERT INTO QLBENHVIEN.HSBA_DV (MAHSBA, LOAIDV, NGAYDV, MAKTV, KETQUA) 
-VALUES ('HS001', 'X-Quang', SYSDATE, 'KTV001', 'Binh Thuong');
+VALUES ('HSBA001', 'X-Quang', SYSDATE, 'KTV001', 'Binh Thuong');
 
-DELETE FROM QLBENHVIEN.HSBA_DV WHERE MAHSBA = 'HS001';
+DELETE FROM QLBENHVIEN.HSBA_DV WHERE MAHSBA = 'HSBA001';
 
 -- ============================================================
 -- Phần 4: Đọc xuất dữ liệu nhật ký kiểm toán
