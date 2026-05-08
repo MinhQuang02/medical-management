@@ -53,9 +53,4 @@ cd MedicalModule
 dotnet run
 ```
 
-Similarly, the `AdminModule` runs completely independently:
-
-```ps1
-cd AdminModule
-dotnet run
-```
+Admin authentication is handled from the same `MedicalModule` login window. Use the admin username/password fields to open the database administration dashboard.

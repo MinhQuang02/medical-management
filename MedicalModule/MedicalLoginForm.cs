@@ -7,6 +7,50 @@ public partial class MedicalLoginForm : Form
         InitializeComponent();
         // Use async void event handler so Oracle calls never block the UI thread
         btnLogin.Click += async (s, e) => await BtnLogin_ClickAsync();
+        btnAdminLogin.Click += async (s, e) => await BtnAdminLogin_ClickAsync();
+    }
+
+    private async Task BtnAdminLogin_ClickAsync()
+    {
+        string adminUsername = txtAdminUsername.Text.Trim();
+        string adminPassword = txtAdminPassword.Text;
+
+        if (string.IsNullOrWhiteSpace(adminUsername) || string.IsNullOrWhiteSpace(adminPassword))
+        {
+            MessageBox.Show("Vui lòng nhập đầy đủ tài khoản và mật khẩu admin.", "Thiếu thông tin",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+
+        btnAdminLogin.Enabled = false;
+        btnAdminLogin.Text = "Đang xác thực...";
+
+        try
+        {
+            bool connected = await Task.Run(() => AdminDatabaseHelper.CheckConnection(adminUsername, adminPassword, showError: false));
+            if (!connected)
+            {
+                MessageBox.Show(
+                    "Đăng nhập admin thất bại.\n\nKiểm tra tài khoản DBA, mật khẩu và Oracle XE service.",
+                    "Lỗi xác thực admin", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            this.Hide();
+            var adminDashboard = new AdminDashboard(adminUsername, adminPassword);
+            adminDashboard.FormClosed += (s, args) => this.Close();
+            adminDashboard.Show();
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Đăng nhập admin thất bại:\n{ex.Message.Split('\n')[0].Trim()}",
+                "Lỗi xác thực admin", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        finally
+        {
+            btnAdminLogin.Enabled = true;
+            btnAdminLogin.Text = "ĐĂNG NHẬP ADMIN";
+        }
     }
 
     private async Task BtnLogin_ClickAsync()
