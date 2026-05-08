@@ -25,7 +25,7 @@ public class TechnicianForm : Form
         _username = username;
         this.Text = "Technician Form - Assigned Services";
         this.Size = new Size(800, 600);
-        
+
         InitializeUI();
         LoadData();
     }
@@ -37,13 +37,13 @@ public class TechnicianForm : Form
 
         dgvServices = new DataGridView() { Location = new Point(20, 50), Size = new Size(740, 300), ReadOnly = true, SelectionMode = DataGridViewSelectionMode.FullRowSelect, AllowUserToAddRows = false };
         this.Controls.Add(dgvServices);
-        
+
         Label lblResult = new Label() { Text = "Kết quả:", Location = new Point(20, 360), AutoSize = true };
         this.Controls.Add(lblResult);
-        
+
         txtResult = new TextBox() { Location = new Point(80, 355), Size = new Size(400, 30) };
         this.Controls.Add(txtResult);
-        
+
         btnSave = new Button() { Text = "Lưu Kết Quả", Location = new Point(490, 350), Size = new Size(120, 30) };
         btnSave.Click += BtnSave_Click;
         this.Controls.Add(btnSave);
