@@ -285,7 +285,7 @@ public class TechnicianForm : Form
         try
         {
             _db.ExecuteNonQuery(
-                $@"UPDATE {Schema}.HSBA_DV
+                $@"UPDATE {Schema}.KTV_XEMHSBA_DV
                    SET KETQUA = :kq
                    WHERE MAHSBA = :ma
                    AND LOAIDV = :loai",
